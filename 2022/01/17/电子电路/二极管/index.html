@@ -20,20 +20,25 @@
     var CONFIG = {"hostname":"github.com","root":"/huigang39.github.io/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="本文介绍了如何在 Arduino 开发板上利用 ROS 来对 IMU 惯性传感器的数据进行处理并可视化">
+  <meta name="description" content="本文介绍了 PN 结的基本结构和工作原理。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ROS 结合 IMU 实现位姿检测">
-<meta property="og:url" content="https://github.com/huigang39/huigang39.github.io/2022/01/15/ROS/ROS-%E7%BB%93%E5%90%88-IMU-%E5%AE%9E%E7%8E%B0%E4%BD%8D%E5%A7%BF%E6%A3%80%E6%B5%8B/index.html">
+<meta property="og:title" content="PN 结">
+<meta property="og:url" content="https://github.com/huigang39/huigang39.github.io/2022/01/17/%E7%94%B5%E5%AD%90%E7%94%B5%E8%B7%AF/%E4%BA%8C%E6%9E%81%E7%AE%A1/index.html">
 <meta property="og:site_name" content="伊卡洛斯的小站">
-<meta property="og:description" content="本文介绍了如何在 Arduino 开发板上利用 ROS 来对 IMU 惯性传感器的数据进行处理并可视化">
+<meta property="og:description" content="本文介绍了 PN 结的基本结构和工作原理。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-01-15T05:41:37.000Z">
-<meta property="article:modified_time" content="2022-01-17T09:30:14.386Z">
+<meta property="og:image" content="https://s2.loli.net/2022/01/17/o8dGw7RnuhksQYe.png">
+<meta property="og:image" content="https://s2.loli.net/2022/01/17/2QaXympLSIlJTgj.gif">
+<meta property="og:image" content="https://s2.loli.net/2022/01/17/9nrEeOUdth4q8QG.gif">
+<meta property="og:image" content="https://s2.loli.net/2022/01/17/Pp5GKfD1YIlx7jR.gif">
+<meta property="article:published_time" content="2022-01-17T09:28:56.000Z">
+<meta property="article:modified_time" content="2022-01-17T11:14:06.486Z">
 <meta property="article:author" content="Huigang Wang">
-<meta property="article:tag" content="ROS">
+<meta property="article:tag" content="模拟电路">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s2.loli.net/2022/01/17/o8dGw7RnuhksQYe.png">
 
-<link rel="canonical" href="https://github.com/huigang39/huigang39.github.io/2022/01/15/ROS/ROS-%E7%BB%93%E5%90%88-IMU-%E5%AE%9E%E7%8E%B0%E4%BD%8D%E5%A7%BF%E6%A3%80%E6%B5%8B/">
+<link rel="canonical" href="https://github.com/huigang39/huigang39.github.io/2022/01/17/%E7%94%B5%E5%AD%90%E7%94%B5%E8%B7%AF/%E4%BA%8C%E6%9E%81%E7%AE%A1/">
 
 
 <script id="page-configurations">
@@ -46,7 +51,7 @@
   };
 </script>
 
-  <title>ROS 结合 IMU 实现位姿检测 | 伊卡洛斯的小站</title>
+  <title>PN 结 | 伊卡洛斯的小站</title>
   
 
 
@@ -152,7 +157,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://github.com/huigang39/huigang39.github.io/2022/01/15/ROS/ROS-%E7%BB%93%E5%90%88-IMU-%E5%AE%9E%E7%8E%B0%E4%BD%8D%E5%A7%BF%E6%A3%80%E6%B5%8B/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/huigang39/huigang39.github.io/2022/01/17/%E7%94%B5%E5%AD%90%E7%94%B5%E8%B7%AF/%E4%BA%8C%E6%9E%81%E7%AE%A1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/huigang39.github.io/images/avatar.gif">
@@ -165,7 +170,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          ROS 结合 IMU 实现位姿检测
+          PN 结
         </h1>
 
         <div class="post-meta">
@@ -174,19 +179,13 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2022-01-15 13:41:37" itemprop="dateCreated datePublished" datetime="2022-01-15T13:41:37+08:00">2022-01-15</time>
+              <time title="创建时间：2022-01-17 17:28:56 / 修改时间：19:14:06" itemprop="dateCreated datePublished" datetime="2022-01-17T17:28:56+08:00">2022-01-17</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-01-17 17:30:14" itemprop="dateModified" datetime="2022-01-17T17:30:14+08:00">2022-01-17</time>
-              </span>
 
           
-            <div class="post-description">本文介绍了如何在 Arduino 开发板上利用 ROS 来对 IMU 惯性传感器的数据进行处理并可视化</div>
+            <div class="post-description">本文介绍了 PN 结的基本结构和工作原理。</div>
 
         </div>
       </header>
@@ -197,11 +196,25 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="ROS-结合-IMU-实现位姿检测"><a href="#ROS-结合-IMU-实现位姿检测" class="headerlink" title="ROS 结合 IMU 实现位姿检测"></a>ROS 结合 IMU 实现位姿检测</h1><h2 id="1-ROS-与-Arduino-通信"><a href="#1-ROS-与-Arduino-通信" class="headerlink" title="1. ROS 与 Arduino 通信"></a>1. ROS 与 Arduino 通信</h2><p>​    ROS 与 Arduino 通信方式大致分为两种：</p>
+        <h1 id="PN-结"><a href="#PN-结" class="headerlink" title="PN 结"></a>PN 结</h1><h2 id="PN-结的形成"><a href="#PN-结的形成" class="headerlink" title="PN 结的形成"></a>PN 结的形成</h2><p>​    P（Positive）型和 N（Negative）型半导体可以根据它们的载流子来区分，对半导体（如硅 Si）掺入不同的元素杂质，就可以形成 P 型和 N 型半导体。</p>
 <ol>
-<li>基于 ROS 的话题通信：如话题，服务，行为等方式，这个时候需要用到 rosserial 库，需要安装rosserial_arduino。这种方式的<strong>好处是不需要知道串口之间的通信协议，直接发布和订阅来传递参数，缺点是不稳定，偶尔出现订阅不上话题</strong>，或者 Arduino 设备连接不上的问题。</li>
-<li>直接利用串口通信的规则，即设置好串口的所有配置参数，然后打开串口，通过 <code>write()</code> 和 <code>read()</code> 函数进行写和读。但是必须提前获知串口的通信协议，如“M01 30” 表示第一个关节，转30度。该方法上下位机间通信稳定性高。</li>
+<li><p>P 型半导体：P 型半导体里面能够流动的粒子是空穴，P 型半导体中大红圆是<strong>负离子</strong>，由于材料的性质，它是不可移动的，<strong>而其中的小绿圆（空穴）是可移动的</strong>。</p>
+</li>
+<li><p>N 型半导体：N 型半导体里面能够流动的粒子是电子，N 型半导体中大绿圆是<strong>正离子</strong>，由于材料的性质，它是不可移动的，<strong>而其中的小红圆（电子）是可移动的</strong>。</p>
+<p><img src="https://s2.loli.net/2022/01/17/o8dGw7RnuhksQYe.png" alt="P、N 型半导体"></p>
+</li>
 </ol>
+<blockquote>
+<p>载流子就是导体里面能流动的带电粒子，为电子或者是空穴，空穴可以看作是带正电的电子。因为当电子从右边跑到左边，把左边的空穴填上了，但是原来电子所在的位置上就多出来了一个空穴，这个过程可以等效为空穴从左往右移动了。</p>
+</blockquote>
+<p>​    当 P 型半导体和 N 型半导体结合在一起时，由于 P 型半导体中空穴浓度高，N 型半导体中电子浓度高，因此会形成一种扩散运动，如下图所示。</p>
+<p><img src="https://s2.loli.net/2022/01/17/2QaXympLSIlJTgj.gif" alt="扩散运动"></p>
+<p>​    这样一来，<strong>P 型区剩下不能自由移动的负离子，而 N 型区剩下不能自由移动的正离子</strong>，一正一负，在 PN 结内部形成了一个从左往右的内电场，基本上这个内电场就体现 PN 结的工作特性。另外有一点要说明的是，<strong>PN 结只是局部带电，即 P 型区呈负电，而 N型区呈负电，但是它们俩一中和，整体上是呈中性的。</strong></p>
+<h2 id="PN-结外接电压"><a href="#PN-结外接电压" class="headerlink" title="PN 结外接电压"></a>PN 结外接电压</h2><h3 id="1-正向电压"><a href="#1-正向电压" class="headerlink" title="1. 正向电压"></a>1. 正向电压</h3><p>​    当 PN 结接正向电压时，被称为<strong>正向偏置</strong>，简称正偏，即 P 型区接电源的正极，N 型区接电源的负极。这时外加电源形成的电场就会与内电场方向相反，而当外电场的强度超过内电场的时候，PN 结就导通了，这时电子就可以从 PN 结通过。如下图所示。</p>
+<p><img src="https://s2.loli.net/2022/01/17/9nrEeOUdth4q8QG.gif" alt="外接正向电压"></p>
+<p>​    电路中，在导线上流动的是负电子，上图中为了方便起见，用空穴表示，不会影响分析过程。在外部电场完全抵消内部电场之后，空穴就可以畅通无阻地通过 PN 结了。</p>
+<h3 id="2-反向电压"><a href="#2-反向电压" class="headerlink" title="2. 反向电压"></a>2. 反向电压</h3><p>​    当 PN 结接反向电压时，被称为<strong>反向偏置</strong>，简称反偏，P 型区的空穴会被电子抵消掉，而 N 型区电子会流动到电源的正极，这样一来，会有助于内电场强度增强，更不利于电子通过 PN 结。内电场不停地增强，会超过外部电源形成的电场强度，超过之后，电子就不能够通过 PN 结了。在外部看来，就是反向电阻无穷大了。</p>
+<p><img src="https://s2.loli.net/2022/01/17/Pp5GKfD1YIlx7jR.gif" alt="外接反向电压"></p>
 
     </div>
 
@@ -211,7 +224,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/huigang39.github.io/tags/ROS/" rel="tag"># ROS</a>
+              <a href="/huigang39.github.io/tags/%E6%A8%A1%E6%8B%9F%E7%94%B5%E8%B7%AF/" rel="tag"># 模拟电路</a>
           </div>
 
         
@@ -219,11 +232,11 @@
 
         
     <div class="post-nav">
-      <div class="post-nav-item"></div>
       <div class="post-nav-item">
-    <a href="/huigang39.github.io/2022/01/17/%E7%94%B5%E5%AD%90%E7%94%B5%E8%B7%AF/%E4%BA%8C%E6%9E%81%E7%AE%A1/" rel="next" title="PN 结">
-      PN 结 <i class="fa fa-chevron-right"></i>
+    <a href="/huigang39.github.io/2022/01/15/ROS/ROS-%E7%BB%93%E5%90%88-IMU-%E5%AE%9E%E7%8E%B0%E4%BD%8D%E5%A7%BF%E6%A3%80%E6%B5%8B/" rel="prev" title="ROS 结合 IMU 实现位姿检测">
+      <i class="fa fa-chevron-left"></i> ROS 结合 IMU 实现位姿检测
     </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -282,7 +295,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ROS-%E7%BB%93%E5%90%88-IMU-%E5%AE%9E%E7%8E%B0%E4%BD%8D%E5%A7%BF%E6%A3%80%E6%B5%8B"><span class="nav-number">1.</span> <span class="nav-text">ROS 结合 IMU 实现位姿检测</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-ROS-%E4%B8%8E-Arduino-%E9%80%9A%E4%BF%A1"><span class="nav-number">1.1.</span> <span class="nav-text">1. ROS 与 Arduino 通信</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#PN-%E7%BB%93"><span class="nav-number">1.</span> <span class="nav-text">PN 结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#PN-%E7%BB%93%E7%9A%84%E5%BD%A2%E6%88%90"><span class="nav-number">1.1.</span> <span class="nav-text">PN 结的形成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PN-%E7%BB%93%E5%A4%96%E6%8E%A5%E7%94%B5%E5%8E%8B"><span class="nav-number">1.2.</span> <span class="nav-text">PN 结外接电压</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E6%AD%A3%E5%90%91%E7%94%B5%E5%8E%8B"><span class="nav-number">1.2.1.</span> <span class="nav-text">1. 正向电压</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%8F%8D%E5%90%91%E7%94%B5%E5%8E%8B"><span class="nav-number">1.2.2.</span> <span class="nav-text">2. 反向电压</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
