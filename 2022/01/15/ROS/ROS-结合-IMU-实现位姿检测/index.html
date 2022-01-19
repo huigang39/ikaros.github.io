@@ -27,11 +27,15 @@
 <meta property="og:site_name" content="伊卡洛斯的小站">
 <meta property="og:description" content="本文介绍了如何在 Arduino 开发板上利用 ROS 来对 IMU 惯性传感器的数据进行处理并可视化">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.loli.net/2022/01/19/8t5UnHJxX7OBKbp.png">
+<meta property="og:image" content="https://s2.loli.net/2022/01/19/MgF1VtOGRosxljq.png">
+<meta property="og:image" content="https://s2.loli.net/2022/01/19/9AFyTKVc7Meatr3.png">
 <meta property="article:published_time" content="2022-01-15T05:41:37.000Z">
-<meta property="article:modified_time" content="2022-01-17T09:30:14.386Z">
+<meta property="article:modified_time" content="2022-01-19T03:39:08.613Z">
 <meta property="article:author" content="Huigang Wang">
 <meta property="article:tag" content="ROS">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s2.loli.net/2022/01/19/8t5UnHJxX7OBKbp.png">
 
 <link rel="canonical" href="https://github.com/huigang39/ikaros.github.io/2022/01/15/ROS/ROS-%E7%BB%93%E5%90%88-IMU-%E5%AE%9E%E7%8E%B0%E4%BD%8D%E5%A7%BF%E6%A3%80%E6%B5%8B/">
 
@@ -208,7 +212,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-01-17 17:30:14" itemprop="dateModified" datetime="2022-01-17T17:30:14+08:00">2022-01-17</time>
+                <time title="修改时间：2022-01-19 11:39:08" itemprop="dateModified" datetime="2022-01-19T11:39:08+08:00">2022-01-19</time>
               </span>
 
           
@@ -225,9 +229,23 @@
       
         <h1 id="ROS-结合-IMU-实现位姿检测"><a href="#ROS-结合-IMU-实现位姿检测" class="headerlink" title="ROS 结合 IMU 实现位姿检测"></a>ROS 结合 IMU 实现位姿检测</h1><h2 id="1-ROS-与-Arduino-通信"><a href="#1-ROS-与-Arduino-通信" class="headerlink" title="1. ROS 与 Arduino 通信"></a>1. ROS 与 Arduino 通信</h2><p>​    ROS 与 Arduino 通信方式大致分为两种：</p>
 <ol>
-<li>基于 ROS 的话题通信：如话题，服务，行为等方式，这个时候需要用到 rosserial 库，需要安装rosserial_arduino。这种方式的<strong>好处是不需要知道串口之间的通信协议，直接发布和订阅来传递参数，缺点是不稳定，偶尔出现订阅不上话题</strong>，或者 Arduino 设备连接不上的问题。</li>
-<li>直接利用串口通信的规则，即设置好串口的所有配置参数，然后打开串口，通过 <code>write()</code> 和 <code>read()</code> 函数进行写和读。但是必须提前获知串口的通信协议，如“M01 30” 表示第一个关节，转30度。该方法上下位机间通信稳定性高。</li>
+<li>基于 ROS 的话题通信：如话题，服务，行为等方式，这个时候需要用到 <code>rosserial</code> 库，需要安装<code>rosserial-arduino</code>。这种方式的<strong>好处是不需要知道串口之间的通信协议，直接发布和订阅来传递参数，缺点是不稳定，偶尔出现订阅不上话题</strong>，或者 Arduino 设备连接不上的问题。</li>
+<li>直接利用串口通信的规则，即设置好串口的所有配置参数，然后打开串口，通过  <code>write()</code>  和  <code>read()</code>  函数进行写和读。<strong>但是必须提前获知串口的通信协议</strong>，如“M01 30” 表示第一个关节，转30度。该方法上下位机间通信稳定性高。</li>
 </ol>
+<p>​    由于是第一次接触这东西，所以先采用简单的 <code>rosserial</code> 库试试水。</p>
+<h2 id="2-安装-rosserial-arduino"><a href="#2-安装-rosserial-arduino" class="headerlink" title="2. 安装 rosserial-arduino"></a>2. 安装 <code>rosserial-arduino</code></h2><p>​    第一步先要安装 <code>rosserial</code> 和 <code>rosserial-arduino</code>，如果之前安装的 ROS 版本是 <code>desktop-full</code>，那么第一个 <code>rosserial</code> 的包就已经被包括在里面了，只用下载第二个就行了，具体方法是：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 下面的 &lt;distro&gt; 换成对应的 ROS 版本，如 noetic，melodic，indigo 等</span></span><br><span class="line">sudo apt install ros-&lt;distro&gt;-rosserial-arduino</span><br><span class="line"></span><br><span class="line"><span class="comment"># 下面是 rosserial 包的安装命令</span></span><br><span class="line">sudo apt install ros-&lt;distro&gt;-rosserial</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://s2.loli.net/2022/01/19/8t5UnHJxX7OBKbp.png" alt="image-20220119105827202"></p>
+<h2 id="3-配置头文件、库文件"><a href="#3-配置头文件、库文件" class="headerlink" title="3. 配置头文件、库文件"></a>3. 配置头文件、库文件</h2><p>​    首先配置 Arduino 的 ROS 的库文件，在 Arduino 项目的库文件夹目录下打开终端，运行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rosrun rosserial_arduino make_libraries.py .</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://s2.loli.net/2022/01/19/MgF1VtOGRosxljq.png" alt="image-20220119111527533"></p>
+<p>​    我这里用的是 VSCode 里的 PlatformIO 插件，这个插件可以支持几百种板子的调试和烧录，配合 VSCode 里的 Copilot 插件的代码提示，非常好用。可以看到 <code>include</code> 文件夹里多出来了一个名字为 <code>ros_lib</code> 的文件夹，这里面存放的就是针对 Arduino 的关于 ROS 的头文件和库文件。</p>
+<blockquote>
+<p>需要注意的是，<code>ros_lib</code> 里面还包括 <code>time.cpp</code> <code>duration.cpp</code> 这两个库文件，如果你使用的也是 PlatformIO 的话，需要将这两个 <code>cpp</code> 库文件放进 <code>src</code> （Source）源文件的文件夹，或者编译的时候指定库文件所在的目录，不然会出现 <code>undefined reference to ‘ros::normalizeSecNSec(unsigned long&amp;, unsigned long&amp;)’</code>的报错，这个报错的原因就是编译器在链接（<code>link</code>）的时候找不到头文件（<code>.h</code>）里的函数的定义（定义在 <code>.cpp</code> 文件里）。</p>
+<p><img src="https://s2.loli.net/2022/01/19/9AFyTKVc7Meatr3.png" alt="image-20220119113328251"></p>
+</blockquote>
 
     </div>
 
@@ -308,7 +326,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ROS-%E7%BB%93%E5%90%88-IMU-%E5%AE%9E%E7%8E%B0%E4%BD%8D%E5%A7%BF%E6%A3%80%E6%B5%8B"><span class="nav-number">1.</span> <span class="nav-text">ROS 结合 IMU 实现位姿检测</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-ROS-%E4%B8%8E-Arduino-%E9%80%9A%E4%BF%A1"><span class="nav-number">1.1.</span> <span class="nav-text">1. ROS 与 Arduino 通信</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ROS-%E7%BB%93%E5%90%88-IMU-%E5%AE%9E%E7%8E%B0%E4%BD%8D%E5%A7%BF%E6%A3%80%E6%B5%8B"><span class="nav-number">1.</span> <span class="nav-text">ROS 结合 IMU 实现位姿检测</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-ROS-%E4%B8%8E-Arduino-%E9%80%9A%E4%BF%A1"><span class="nav-number">1.1.</span> <span class="nav-text">1. ROS 与 Arduino 通信</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%AE%89%E8%A3%85-rosserial-arduino"><span class="nav-number">1.2.</span> <span class="nav-text">2. 安装 rosserial-arduino</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E9%85%8D%E7%BD%AE%E5%A4%B4%E6%96%87%E4%BB%B6%E3%80%81%E5%BA%93%E6%96%87%E4%BB%B6"><span class="nav-number">1.3.</span> <span class="nav-text">3. 配置头文件、库文件</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -322,7 +340,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/ikaros.github.io/archives/">
         
-          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-count">5</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
