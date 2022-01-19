@@ -30,13 +30,13 @@
 <meta property="og:image" content="https://s2.loli.net/2022/01/19/8t5UnHJxX7OBKbp.png">
 <meta property="og:image" content="https://s2.loli.net/2022/01/19/MgF1VtOGRosxljq.png">
 <meta property="og:image" content="https://s2.loli.net/2022/01/19/RAd2IDNqBtimF31.png">
-<meta property="og:image" content="https://github.com/huigang39/ikaros.github.io/.config/Typora/typora-user-images/image-20220119134814696.png">
+<meta property="og:image" content="https://s2.loli.net/2022/01/19/jXWKOdURw1FHqCi.png">
 <meta property="og:image" content="https://s2.loli.net/2022/01/19/YeDLIpHmawc4XbA.png">
 <meta property="og:image" content="https://s2.loli.net/2022/01/19/SpQVKy2ixN7M1F9.png">
 <meta property="og:image" content="https://github.com/huigang39/ikaros.github.io/.config/Typora/typora-user-images/image-20220119143849564.png">
 <meta property="og:image" content="https://s2.loli.net/2022/01/19/68SU9AWhkfi5aRK.png">
 <meta property="article:published_time" content="2022-01-15T05:41:37.000Z">
-<meta property="article:modified_time" content="2022-01-19T06:46:22.246Z">
+<meta property="article:modified_time" content="2022-01-19T06:49:07.522Z">
 <meta property="article:author" content="Huigang Wang">
 <meta property="article:tag" content="ROS">
 <meta name="twitter:card" content="summary">
@@ -217,7 +217,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-01-19 14:46:22" itemprop="dateModified" datetime="2022-01-19T14:46:22+08:00">2022-01-19</time>
+                <time title="修改时间：2022-01-19 14:49:07" itemprop="dateModified" datetime="2022-01-19T14:49:07+08:00">2022-01-19</time>
               </span>
 
           
@@ -254,7 +254,7 @@
 </blockquote>
 <p>​    配置完 ROS 库文件之后，就该配置 MPU6050 的库文件了，这里需要注意的是，网上有很多 MPU6050 的库文件，它们不尽相同，所以在使用的时候也需要注意，很可能这个库文件和你在网上找到的教程所用的库文件不同，导致他调用的函数你这库文件就没有，更不要把这个头文件和另一个库文件一起使用，很可能会出现函数未定义的情况！</p>
 <p>​    如果你用的是 Arduino 官方的 IDE 的话，可以直接在库管理那里面搜索 MPU6050 就可以搜索到，如果你使用第三方的代码编辑工具，比如 PlatformIO 之类的，其实也有它对应的库管理工具，但是我装了之后还是会报错，可能是我配置的原因，应该是能成功的。所以我是直接从 Github 下载的源代码然后放到库文件夹里面。</p>
-<p><img src="../../../../../.config/Typora/typora-user-images/image-20220119134814696.png" alt="image-20220119134814696"></p>
+<p><img src="https://s2.loli.net/2022/01/19/jXWKOdURw1FHqCi.png" alt="image-20220119134814696"></p>
 <p>​    我用的是上图这个<a href="https://github.com/jarzebski/Arduino-MPU6050">仓库</a>里面的 <code>MPU6050.cpp</code> <code>MPU6050.h</code> 这两个文件，当然，这里面给的实例代码也都是可以运行的，只不过是以串口的方式输出数据的，并没有使用到 ROS。</p>
 <h2 id="编写代码并运行"><a href="#编写代码并运行" class="headerlink" title="编写代码并运行"></a>编写代码并运行</h2><p>​    这一步才开始来编写我们的代码，可以去到 <a target="_blank" rel="noopener" href="http://wiki.ros.org/rosserial_arduino/Tutorials">ROS Wiki</a> 找到有关 <code>rosserial</code> 的示例教程。这里我先写一个经典的 Hello World 程序，它展示了如何使用发布者来发布消息。</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * rosserial Publisher Example</span></span><br><span class="line"><span class="comment"> * Prints &quot;hello world!&quot;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Use the following line if you have a Leonardo or MKR1000</span></span><br><span class="line"><span class="comment">//#define USE_USBCON</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;ros.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;std_msgs/String.h&gt;</span></span></span><br><span class="line"></span><br><span class="line">ros::NodeHandle nh;</span><br><span class="line"></span><br><span class="line">std_msgs::String str_msg;</span><br><span class="line"><span class="function">ros::Publisher <span class="title">chatter</span><span class="params">(<span class="string">&quot;chatter&quot;</span>, &amp;str_msg)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span> hello[<span class="number">13</span>] = <span class="string">&quot;hello world!&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">setup</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  nh.<span class="built_in">initNode</span>();</span><br><span class="line">  nh.<span class="built_in">advertise</span>(chatter);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">loop</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  str_msg.data = hello;</span><br><span class="line">  chatter.<span class="built_in">publish</span>( &amp;str_msg );</span><br><span class="line">  nh.<span class="built_in">spinOnce</span>();</span><br><span class="line">  <span class="built_in">delay</span>(<span class="number">1000</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
